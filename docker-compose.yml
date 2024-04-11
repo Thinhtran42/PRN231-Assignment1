@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  prn231_group5.assignment1.api:
+    image: ${DOCKER_REGISTRY-}prn231group5assignment1
+    build:
+      context: .
+      dockerfile: PRN231_Group5.Assignment1.API/Dockerfile
