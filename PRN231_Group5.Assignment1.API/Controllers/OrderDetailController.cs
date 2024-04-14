@@ -26,7 +26,7 @@ namespace PRN231_Group5.Assignment1.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDetailViewModel>>> GetOderDetails()
         {
-            var orderDetails = await _unitOfWork.OrderDetailRepository.GetAsync();
+            var orderDetails = await _unitOfWork.OrderDetailRepository.GetAsync(orderBy: q => q.OrderBy(o => o.UnitPrice));
             if (orderDetails == null || !orderDetails.Any())
             {
                 return NotFound();

@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PRN231_Group5.Assignment1.Repo.Interfaces;
 using PRN231_Group5.Assignment1.Repo.Models;
@@ -22,11 +22,63 @@ namespace PRN231_Group5.Assignment1.API.Controllers
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             var products = await _unitOfWork.ProductRepository.GetAsync();
+
             if (products == null || !products.Any())
             {
                 return NotFound();
             }
             return Ok(products);
+        }
+
+        [HttpGet("pagination")]
+        public async Task<IActionResult> GetProductsPagination(
+                                                [FromQuery] int? pageIndex,
+                                                [FromQuery] string? productName,
+                                                [FromQuery] decimal? minUnitPrice,
+                                                [FromQuery] decimal? maxUnitPrice,
+                                                [FromQuery] int? categoryId,
+                                                [FromQuery] string? sortBy)
+        {
+            int pageSize = 4;
+            var products = _unitOfWork.ProductRepository.Get();
+            if (!string.IsNullOrEmpty(productName))
+            {
+                products = products.Where(p => p.ProductName.Contains(productName));
+            }
+
+            if (minUnitPrice.HasValue)
+            {
+                products = products.Where(p => p.UnitPrice >= minUnitPrice.Value);
+            }
+
+            if (maxUnitPrice.HasValue)
+            {
+                products = products.Where(p => p.UnitPrice <= maxUnitPrice.Value);
+            }
+
+            if (categoryId.HasValue)
+            {
+                products = products.Where(p => p.CategoryId == categoryId.Value);
+            }
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                if (sortBy.ToLower() == "desc")
+                {
+                    products = products.OrderByDescending(p => p.UnitPrice);
+                }
+                else
+                {
+                    products = products.OrderBy(p => p.UnitPrice);
+                }
+            }
+            //products = _unitOfWork.ProductRepository.Get(pageIndex: pageIndex.HasValue ? Math.Max(pageIndex.Value, 1) : 1, pageSize: pageSize, includeProperties: "Category");
+            // Thực hiện tìm kiếm và lưu trữ kết quả vào biến tempProducts
+            var tempProducts = products.ToList();
+
+            var paginatedProducts = tempProducts.Skip((pageIndex ?? 0) * pageSize).Take(pageSize);
+
+
+            return Ok(paginatedProducts);
         }
 
         // GET: api/product/5

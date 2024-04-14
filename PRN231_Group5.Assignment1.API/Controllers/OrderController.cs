@@ -20,9 +20,11 @@ namespace PRN231_Group5.Assignment1.API.Controllers
         }
         // GET: api/Order
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrders(DateTime? startDate, DateTime? endDate)
         {
-            var orders = await _unitOfWork.OrderRepository.GetAsync();
+            var orders = await _unitOfWork.OrderRepository.GetAsync(
+       filter: o => (!startDate.HasValue || o.OrderDate >= startDate) && (!endDate.HasValue || o.OrderDate <= endDate),
+       orderBy: q => q.OrderByDescending(order => order.OrderDate));
             if (orders == null || !orders.Any())
             {
                 return NotFound();
@@ -48,8 +50,18 @@ namespace PRN231_Group5.Assignment1.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Order>> CreateOrder([FromBody] CreateOrderViewModel orderViewModel)
         {
+            DateTime currentDateTime = DateTime.Now;
+
             var order = _mapper.Map<Order>(orderViewModel);
 
+            order.OrderDate = currentDateTime;
+            order.RequiredDate = currentDateTime.AddDays(1);
+            order.ShippedDate = order.RequiredDate.Value.AddDays(1);
+
+            if (order.ShippedDate <= order.RequiredDate || order.RequiredDate <= order.OrderDate)
+            {
+                return BadRequest("ShippedDate must be greater than RequiredDate, and RequiredDate must be greater than OrderDate.");
+            }
             Random random = new Random();
             order.OrderId = random.Next();
 

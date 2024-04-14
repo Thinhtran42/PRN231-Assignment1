@@ -26,8 +26,9 @@ namespace PRN231_Group5.Assignment1.Repo.Mappers
             CreateMap<UpdateOrderViewModel, Order>();
 
             CreateMap<CreateOrderDetailViewModel, OrderDetail>();
-            CreateMap<OrderDetail, OrderDetailViewModel>();
+            CreateMap<OrderDetail, OrderDetailViewModel>().ReverseMap();
             CreateMap<UpdateOrderDetailViewModel, OrderDetail>();
+            
         }
     }
 }

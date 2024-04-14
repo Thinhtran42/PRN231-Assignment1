@@ -101,6 +101,33 @@ namespace PRN231_Group5.Assignment1.Repo.Repositories
         {
             dbSet.UpdateRange(entities);
         }
+
+        public IQueryable<Product> Get(Expression<Func<Product, bool>> filter = null,
+                                Func<IQueryable<Product>, IOrderedQueryable<Product>> orderBy = null,
+                                string includeProperties = "")
+        {
+            IQueryable<Product> query = context.Set<Product>();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            foreach (var includeProperty in includeProperties.Split
+                                                    (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            if (orderBy != null)
+            {
+                return orderBy(query);
+            }
+            else
+            {
+                return query;
+            }
+        }
     }
 }
 
