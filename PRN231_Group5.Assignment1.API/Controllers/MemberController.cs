@@ -99,11 +99,5 @@ namespace PRN231_Group5.Assignment1.API.Controllers
 
             return NoContent();
         }
-
-        [HttpGet("IsMemberExists/id")]
-        public bool MemberExists(int id)
-        {
-            return _unitOfWork.MemberRepository.isExists(m => m.MemberId == id);
-        }
     }
 }

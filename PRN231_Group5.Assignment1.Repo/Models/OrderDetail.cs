@@ -5,7 +5,7 @@ namespace PRN231_Group5.Assignment1.Repo.Models;
 
 public partial class OrderDetail
 {
-    public int Id;
+    public int Id { get; set; }
     public int OrderId { get; set; }
 
     public int ProductId { get; set; }

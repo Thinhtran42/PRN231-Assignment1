@@ -66,6 +66,11 @@ namespace PRN231_Group5.Assignment1.Repo.Repositories
             dbSet.Add(entity);
         }
 
+        public async virtual Task InsertRangeAsync(IEnumerable<TEntity> entities)
+        {
+           await dbSet.AddRangeAsync(entities);
+        }
+
         public virtual void Delete(object id)
         {
             TEntity entityToDelete = dbSet.Find(id);
@@ -90,6 +95,11 @@ namespace PRN231_Group5.Assignment1.Repo.Repositories
         {
             dbSet.Attach(entityToUpdate);
             context.Entry(entityToUpdate).State = EntityState.Modified;
+        }
+
+        public virtual void UpdateRange(IEnumerable<TEntity> entities)
+        {
+            dbSet.UpdateRange(entities);
         }
     }
 }

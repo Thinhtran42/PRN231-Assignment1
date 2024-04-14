@@ -15,9 +15,11 @@ namespace PRN231_Group5.Assignment1.Repo.Interfaces
         Task<TEntity> GetByIDAsync(object id);
         bool isExists(Expression<Func<TEntity, bool>> filter);
         void Insert(TEntity entity);
+        Task InsertRangeAsync(IEnumerable<TEntity> entities);
         void Delete(object id);
         void Delete(TEntity entityToDelete);
         void Update(TEntity entityToUpdate);
+        void UpdateRange(IEnumerable<TEntity> entities);
     }
 }
 

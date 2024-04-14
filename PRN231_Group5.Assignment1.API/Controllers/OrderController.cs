@@ -1,8 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PRN231_Group5.Assignment1.Repo.Interfaces;
 using PRN231_Group5.Assignment1.Repo.Models;
 using PRN231_Group5.Assignment1.Repo.VIewModels.Order;
+using PRN231_Group5.Assignment1.Repo.VIewModels.OrderDetail;
 
 namespace PRN231_Group5.Assignment1.API.Controllers
 {
@@ -20,7 +22,7 @@ namespace PRN231_Group5.Assignment1.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
-            var orders = await _unitOfWork.OrderRepository.GetAsync(includeProperties: "OrderDetails");
+            var orders = await _unitOfWork.OrderRepository.GetAsync();
             if (orders == null || !orders.Any())
             {
                 return NotFound();
@@ -44,7 +46,7 @@ namespace PRN231_Group5.Assignment1.API.Controllers
 
         // POST: api/Order
         [HttpPost]
-        public async Task<ActionResult<Order>> CreateProduct([FromBody] CreateOrderViewModel orderViewModel)
+        public async Task<ActionResult<Order>> CreateOrder([FromBody] CreateOrderViewModel orderViewModel)
         {
             var order = _mapper.Map<Order>(orderViewModel);
 
@@ -72,6 +74,49 @@ namespace PRN231_Group5.Assignment1.API.Controllers
 
             _unitOfWork.OrderRepository.Update(updateOrder);
             _unitOfWork.Save();
+
+            return NoContent();
+        }
+
+        // GET: api/orders/orderdetails
+        [HttpGet("{id}/order-details")]
+        public async Task<ActionResult<IEnumerable<OrderDetailViewModel>>> GetOrderDetailByOrder(int id)
+        {
+            var order = await _unitOfWork.OrderRepository.GetAsync(o => o.OrderId == id);
+            if (order == null || !order.Any())
+            {
+                return NotFound($"Order with id {id} not found");
+            }
+
+            var orderDetails = await _unitOfWork.OrderDetailRepository.GetAsync(od => od.OrderId == id);
+
+            var orderDetailViewModels = _mapper.Map<IEnumerable<OrderDetailViewModel>>(orderDetails);
+
+            return Ok(orderDetailViewModels);
+        }
+
+        // PUT: api/orders/5/orderdetails
+        [HttpPut("{id}/order-details")]
+        public async Task<IActionResult> UpdateOrderDetailByOrderId(int id, [FromBody] IEnumerable<UpdateOrderDetailViewModel> models)
+        {
+            var existingOrderDetails = await _unitOfWork.OrderDetailRepository.GetAsync(od => od.OrderId == id);
+
+            if (!existingOrderDetails.Any())
+            {
+                return NotFound($"Not have order detail with Order id {id}");
+            }
+
+            foreach (var model in models)
+            {
+                var orderDetail = existingOrderDetails.FirstOrDefault(od => od.Id == model.Id);
+                if (orderDetail != null)
+                {
+                    var updatedOrderDetail = _mapper.Map(model, orderDetail);
+                    _unitOfWork.OrderDetailRepository.Update(updatedOrderDetail);
+                }
+            }
+            
+             _unitOfWork.Save();
 
             return NoContent();
         }
