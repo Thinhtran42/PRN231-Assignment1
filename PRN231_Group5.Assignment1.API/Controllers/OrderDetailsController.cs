@@ -11,18 +11,18 @@ using PRN231_Group5.Assignment1.Repo.VIewModels.OrderDetail;
 
 namespace PRN231_Group5.Assignment1.API.Controllers
 {
-    public class OrderDetailController : BaseController
+    public class OrderDetailsController : BaseController
     {
         private readonly IUnitOfWork _unitOfWork;
 
         private readonly IMapper _mapper;
 
-        public OrderDetailController(IUnitOfWork unitOfWork, IMapper mapper)
+        public OrderDetailsController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        // GET: api/OrderDetail
+        // GET: api/OrderDetails
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDetailViewModel>>> GetOderDetails()
         {
@@ -41,7 +41,7 @@ namespace PRN231_Group5.Assignment1.API.Controllers
             return Ok(orderDetailViewModels);
         }
 
-        // GET: api/OrderDetail/5
+        // GET: api/OrderDetails/5
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderDetail>> GetOrderDetail(int id)
         {
@@ -54,8 +54,8 @@ namespace PRN231_Group5.Assignment1.API.Controllers
 
             return orderDetail;
         }
-        
-        // POST: api/OrderDetail
+
+        // POST: api/OrderDetails
         [HttpPost]
         public async Task<ActionResult<OrderDetail>> CreateOrderDetail([FromBody] IEnumerable<OrderDetailViewModel> orderDetailsViewModels)
         {
@@ -65,7 +65,7 @@ namespace PRN231_Group5.Assignment1.API.Controllers
                 var orderDetail = _mapper.Map<OrderDetail>(orderDetailViewModel);
                 orderDetails.Add(orderDetail);
             }
-            
+
             await _unitOfWork.OrderDetailRepository.InsertRangeAsync(orderDetails);
             _unitOfWork.Save();
 
@@ -73,7 +73,7 @@ namespace PRN231_Group5.Assignment1.API.Controllers
             return CreatedAtAction("GetOrder", new { id = orderDetails.FirstOrDefault().OrderId }, orderViewModels);
         }
 
-        // PUT: api/OrderDetail/5
+        // PUT: api/OrderDetails/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateOrderByOrderId(int id, [FromBody] UpdateOrderDetailViewModel model)
         {
@@ -92,7 +92,7 @@ namespace PRN231_Group5.Assignment1.API.Controllers
             return NoContent();
         }
 
-        // DELETE: api/OrderDetail/5
+        // DELETE: api/OrderDetails/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrderDetail(int id)
         {
@@ -106,6 +106,6 @@ namespace PRN231_Group5.Assignment1.API.Controllers
 
             return NoContent();
         }
-        
+
     }
 }
